@@ -6,13 +6,6 @@ const UserRole = {
 
 const userRegisterValidator = () => {
   return [
-    body("username")
-      .trim()
-      .notEmpty()
-      .withMessage("Username is required")
-      .isLength({min:2})
-      .withMessage("Username must be at least 2 characters")
-    ,
     body("email")
       .trim()
       .notEmpty()
