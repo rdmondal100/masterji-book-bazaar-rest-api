@@ -6,6 +6,7 @@ const bookSchema = new Schema({
     required: true,
     index: true,
     text: true,  
+    unique:true
   },
   author: {
     type: String,
@@ -43,4 +44,4 @@ const bookSchema = new Schema({
 }, { timestamps: true });
 
 
-export default Book = mongoose.model("Book",bookSchema)
+export const Book = mongoose.model("Book",bookSchema)

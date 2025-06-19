@@ -1,8 +1,8 @@
 import { body } from "express-validator";
 
 const UserRole = {
-    USER:"User",
-    ADMIN:"Admin"
+    USER:"user",
+    ADMIN:"admin"
 }
 
 export const userRegisterValidator = () => {

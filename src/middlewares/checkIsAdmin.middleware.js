@@ -1,7 +1,7 @@
-import { ApiError } from "../lib/apiError";
+import { ApiError } from "../lib/apiError.js";
 
  
-export const isAdmin = (req, res, next) => {
+export const checkIsAdmin = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     next();
   } else {

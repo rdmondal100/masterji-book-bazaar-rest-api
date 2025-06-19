@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authUserRouter from "./routes/authUser.route.js";
 import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.js";
+import bookRouter from "./routes/book.route.js";
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.get('/',(req,res)=>{
 
 //routes 
 app.use("/api/v1/auth",authUserRouter)
-
+app.use("/api/v1/books",bookRouter)
 
 //global error handler
 app.use(globalErrorHandler);

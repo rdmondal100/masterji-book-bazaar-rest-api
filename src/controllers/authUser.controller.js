@@ -21,7 +21,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 
   // get the user details from user
-  const { email, fullName, password } = req.body;
+  const { email, fullName, password,role="user" } = req.body;
 
   //checking is the user already exists
   const existingUser = await User.findOne({
@@ -37,6 +37,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     fullName,
     email,
     password,
+    role
   });
 
   if (!newUser) {
