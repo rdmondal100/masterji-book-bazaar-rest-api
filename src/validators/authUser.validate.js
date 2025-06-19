@@ -52,5 +52,17 @@ export const userLoginValidator = () => {
       .withMessage("Password is required")
       .isLength({ min: 8 })
       .withMessage("Password must be at least 8 characters long")
+      
+  ]
+}
+
+export const apiKeyValidator = () => {
+  return [
+    body("name")
+      .trim()
+      .notEmpty()
+      .withMessage("Name is required")
+      .matches(/^[A-Za-z\s'-]{2,30}$/)
+      .withMessage("Name must contain only letters, spaces, apostrophes, or hyphens and be 2-30 characters long")
   ]
 }

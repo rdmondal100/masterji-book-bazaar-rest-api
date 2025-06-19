@@ -6,8 +6,8 @@ import { ApiResponse } from "../lib/apiResponse.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { APIKey } from "../models/apikey.model.js";
-
+import { ApiKey } from "../models/apikey.model.js";
+ 
 // register new user
 export const registerUser = asyncHandler(async (req, res) => {
   //error validation
@@ -220,15 +220,20 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 
 //generateNewAPIKey
 export const generateNewAPIKey = asyncHandler(async (req, res) => {
-  const { name, expireInDays = 30, usageLimit } = req.body;
-
-  if (expireInDays > 365) {
-    throw new ApiError(400, "Maximum expiration is 365 days");
+  
+    //error validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const extractedErrors = errors.array().map((err) => ({
+      failed: err.param,
+      message: err.msg,
+    }));
+    throw new ApiError(400, "API key validation failed", extractedErrors);
   }
 
-  const expiresAt = new Date()
-  expiresAt.setDate(expiresAt.getDate() + parseInt(expireInDays))
-  console.log("EXpire date: ",expiresAt)
+  
+  
+    const { name} = req.body;
 
   const randomString = crypto.randomBytes(32).toString("hex");
   if (!randomString) {
@@ -237,15 +242,13 @@ export const generateNewAPIKey = asyncHandler(async (req, res) => {
 
   const key = `bookbazaar_${randomString}`;
 
-  const newAPIKey = await APIKey.create({
+  const newApiKey = await ApiKey.create({
     name,
     key,
     user: req.user._id,
-    expiresAt,
-    usageLimit,
   });
 
-  const response = new ApiResponse(201,{newAPIKey},"New API Key created successfylly")
+  const response = new ApiResponse(201,{newApiKey},"New API Key created successfylly")
 
   return res
         .status(response.statusCode)

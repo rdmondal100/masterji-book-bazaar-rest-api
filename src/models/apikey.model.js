@@ -1,43 +1,27 @@
-import { timeStamp } from "console";
-import mongoose, { Schema } from "mongoose";
+import mongoose from 'mongoose';
 
-const apiKeySchema = new Schema({
+const apiKeySchema = new mongoose.Schema({
   name:{
     type: String,
     required: true,
     trim: true,
-    maxlength: [50, "Name cannot exceed 50 characters"]
-
+     maxlength: [50,"Name can not be more than 50 charecters"]
   },
   user: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   key: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
-  usageLimit: {
-    type: Number,
-    min: [1, "Usage limit must be at least 1"],
-    default: 1000
-  },
-  usageCount: {
-    type: Number,
-    default: 0,
-  },
-  expiresAt: {
+  createdAt: {
     type: Date,
-    required: true,
-  },
-  active: {
-    type: Boolean,
-    default: true,
-  },
-},{
-  timestamps: true
+    default: Date.now,
+    expires: '30d'  
+  }
 });
 
-export const APIKey = mongoose.model("APIKey", apiKeySchema);
+export const ApiKey =  mongoose.model('ApiKey', apiKeySchema);
