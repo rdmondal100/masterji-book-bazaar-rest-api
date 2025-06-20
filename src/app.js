@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authUserRouter from "./routes/authUser.route.js";
 import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.js";
 import bookRouter from "./routes/book.route.js";
+import reviewRouter from "./routes/review.route.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.get('/',(req,res)=>{
 //routes 
 app.use("/api/v1/auth",authUserRouter)
 app.use("/api/v1/books",bookRouter)
+app.use("/api/v1/reviews",reviewRouter)
 
 //global error handler
 app.use(globalErrorHandler);
