@@ -10,8 +10,7 @@ const reviewRouter = Router()
 
 
 
-//public routes
-reviewRouter.route("/books/:bookId").post(checkIsAuthenticated,validateAddReview(),addReview)
+ reviewRouter.route("/books/:bookId").post(checkIsAuthenticated,validateAddReview(),addReview)
 reviewRouter.route("/books/:bookId").get(checkIsAuthenticated,validateGetAllReviewsForBook(),getAllReviewsForBook)
 reviewRouter.route("/:id").delete(checkIsAuthenticated,validateDeleteReview(),deleteReviewById)
  

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const cartItemSchema = new Schema({
   user: {
@@ -20,4 +20,4 @@ const cartItemSchema = new Schema({
 }, { timestamps: true });
 
 
-export default CartItem = mongoose.model("CartItem",cartItemSchema)
+export const CartItem = mongoose.model("CartItem",cartItemSchema)

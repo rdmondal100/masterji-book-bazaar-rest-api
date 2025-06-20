@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const orderItemSchema = new Schema({
   book: {
@@ -11,7 +11,7 @@ const orderItemSchema = new Schema({
     required: true,
     min: 1,
   },
-  priceAtPurchase: {
+  price: {
     type: Number,
     required: true,
   },
@@ -45,4 +45,4 @@ const orderSchema = new Schema({
 }, { timestamps: true });
 
 
-export default Order = mongoose.model("Order",orderSchema)
+export const Order = mongoose.model("Order",orderSchema)
