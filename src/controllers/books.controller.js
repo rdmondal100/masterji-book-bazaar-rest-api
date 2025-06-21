@@ -3,6 +3,8 @@ import { Book } from "../models/book.model.js";
 import { ApiResponse } from "../lib/apiResponse.js";
 import { ApiError } from "../lib/apiError.js";
 import { validationResult } from "express-validator";
+import qs from "qs";
+
 
 export const addBooks = asyncHandler(async (req, res) => {
   //error validation
@@ -29,54 +31,68 @@ export const addBooks = asyncHandler(async (req, res) => {
 
   return res.status(response.statusCode).json(response);
 });
+ 
 
 export const getAllBooks = asyncHandler(async (req, res) => {
-  //error validation
-  const errors = validationResult(req);
+   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const extractedErrors = errors.array().map((err) => ({
       failed: err.param,
       message: err.msg,
     }));
-    throw new ApiError(400, "Register validation failed", extractedErrors);
+    throw new ApiError(400, "Query validation failed", extractedErrors);
   }
 
-  //filtered books based on query
-  const queryObj = { ...req.query };
-  const excludeFields = ["page", "sort", "limit", "fields"];
+  // Parse query 
+  const queryObj = qs.parse(req.query);
+  const excludeFields = ["page", "sort", "limit", "fields", "search"];
   excludeFields.forEach((el) => delete queryObj[el]);
 
-  let queryStr = JSON.stringify(queryObj);
+   if (queryObj.genre && typeof queryObj.genre === "string" && queryObj.genre.includes(",")) {
+    queryObj.genre = { $in: queryObj.genre.split(",") };
+  }
+
+   let queryStr = JSON.stringify(queryObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  const mongoQuery = JSON.parse(queryStr);
 
-  let query = Book.find(JSON.parse(queryStr));
+   if (req.query.search) {
+    const searchRegex = new RegExp(req.query.search, "i"); // case-insensitive
+    mongoQuery.$or = [
+      { title: { $regex: searchRegex } },
+      { author: { $regex: searchRegex } },
+      { description: { $regex: searchRegex } },
+    ];
+  }
 
-  //sorting the filtered books
-  if (req.query.sort) {
+   let query = Book.find(mongoQuery);
+
+   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
     query = query.sort(sortBy);
   } else {
     query = query.sort("-createdAt");
   }
 
-  //pagination on the filtered sorted books
+  // Pagination
   const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 20;
+  const limit = parseInt(req.query.limit, 10) || 8;
   const skip = (page - 1) * limit;
-
   query = query.skip(skip).limit(limit);
 
+  // Execute
   const books = await query;
-  const total = await Book.countDocuments(JSON.parse(queryStr));
+  const total = await Book.countDocuments(mongoQuery);
 
   const response = new ApiResponse(
     200,
-    { count: total.length, books },
-    "Fetched book successfylly"
+    { total, page, limit, books },
+    "Fetched books successfully"
   );
 
   return res.status(response.statusCode).json(response);
 });
+
 
 export const getBookDetailsById = asyncHandler(async (req, res) => {
   const bookId = req.params.id;

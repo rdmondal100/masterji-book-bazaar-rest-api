@@ -249,6 +249,13 @@ export const generateNewAPIKey = asyncHandler(async (req, res) => {
     user: req.user._id,
   });
 
+const updatedUser = await User.findOneAndUpdate(
+  { _id: newApiKey.user },
+  { apiKey: newApiKey._id } ,
+  { new: true }
+);
+  console.log(updatedUser)
+
   const response = new ApiResponse(201,{newApiKey},"New API Key created successfylly")
 
   return res

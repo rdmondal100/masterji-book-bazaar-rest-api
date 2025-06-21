@@ -36,10 +36,10 @@ const userSchema = new Schema(
       default: "user",
     },
 
-    apiKeys:[{
+    apiKey:{
       type: Schema.Types.ObjectId,
       ref: "APIKey"
-    }]
+    }
 
   },
   { timestamps: true }

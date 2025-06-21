@@ -9,7 +9,15 @@ import { sendEmail } from "../lib/email/sendEmail.js";
  
 export const addToCart = asyncHandler(async (req, res) => {
   const { book, quantity } = req.body;
+  
+  console.log(req.user._id)
+  const bookItem = await Book.findById(book)
+  console.log("bookItem")
+  console.log(bookItem)
+  if(quantity > bookItem.stock){
+    throw new ApiError(400,`Only ${bookItem.stock} items are left. You can not buy more than ${bookItem.stock} at this time!`)
 
+  }
   const cartItem = await CartItem.create({
     user: req.user._id,
     book,
@@ -21,7 +29,7 @@ export const addToCart = asyncHandler(async (req, res) => {
   const response = new ApiResponse(
     200,
     { cartItem },
-    "Fetched book successfully"
+    "Book added to cart  successfully"
   );
 
   return res.status(response.statusCode).json(response);
@@ -59,10 +67,14 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Failed to create order");
   }
 
-  await CartItem.deleteMany({ user: req.user._id });
 
- 
-  await sendEmail("ORDER_CONFIRMATION",req.user.email,{orderId:order._id.toString()})
+ console.log(req.user.email)
+ console.log(req.user)
+
+ await sendEmail("ORDER_PLACED",req.user.email,{orderId:order._id.toString()})
+
+    await CartItem.deleteMany({ user: req.user._id });
+
 
   const response = new ApiResponse(201,{order},"Order created successfylly.You will get an conformation email soon. Note: it will send to the mailtrap as it is testing")
 

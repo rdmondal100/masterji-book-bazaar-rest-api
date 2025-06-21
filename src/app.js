@@ -6,6 +6,7 @@ import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.js";
 import bookRouter from "./routes/book.route.js";
 import reviewRouter from "./routes/review.route.js";
 import orderRouter from "./routes/order.route.js";
+import paymentRouter from "./routes/payment.route.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api/v1/auth",authUserRouter)
 app.use("/api/v1/books",bookRouter)
 app.use("/api/v1/reviews",reviewRouter)
 app.use("/api/v1/orders",orderRouter)
+app.use("/api/v1/payment",paymentRouter)
 
 //global error handler
 app.use(globalErrorHandler);

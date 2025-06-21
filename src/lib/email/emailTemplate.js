@@ -1,23 +1,29 @@
 export const emailTemplates = {
-  ORDER_CONFIRMATION: ({ orderId }) => ({
-    subject: `🎉 Order Confirmation - Order #${orderId}`,
+  ORDER_PLACED: ({ orderId }) => ({
+    subject: `📝 Your order #${orderId} has been placed!`,
     html: `
-      <div style="font-family:Arial, sans-serif; padding:20px; color:#333;">
-        <h2 style="color:#4CAF50;">Thank you for your order!</h2>
-        <p>Hello,</p>
-        <p>We're excited to let you know that your order <strong>#${orderId}</strong> has been successfully placed.</p>
-        <div style="background-color:#f2f2f2; padding:15px; border-radius:8px; margin:20px 0;">
-          <h3 style="margin:0; color:#333;">Order Details</h3>
-          <p style="margin:5px 0;"><strong>Order ID:</strong> ${orderId}</p>
-          <p style="margin:5px 0;">You will receive another email once your order has been shipped.</p>
-        </div>
-        <p>If you have any questions, just reply to this email — we're always happy to help.</p>
-        <br/>
-        <p>Best regards,</p>
-        <p><strong>${process.env.FROM_NAME}</strong></p>
+      <div style="font-family:Arial,sans-serif;padding:20px;">
+        <h2 style="color:#007bff;">Order Received!</h2>
+        <p>Hi,</p>
+        <p>Your order <strong>#${orderId}</strong> has been received and is awaiting payment.</p>
+        <p>Please proceed to payment to confirm your order.</p>
+        <p>Thank you!</p>
+        <p><strong>${process.env.FROM_NAME || 'BookBazaar Team'}</strong></p>
       </div>
     `,
   }),
-  
 
- };
+  ORDER_CONFIRMED: ({ orderId }) => ({
+    subject: `🎉 Payment Successful - Order #${orderId} Confirmed!`,
+    html: `
+      <div style="font-family:'Segoe UI', Tahoma, sans-serif;padding:20px;">
+        <h2 style="color:#28a745;">Payment Confirmed!</h2>
+        <p>Hi,</p>
+        <p>Your payment for order <strong>#${orderId}</strong> has been successfully received.</p>
+        <p>We're now processing your order and you'll receive a shipping update soon.</p>
+        <p>Thanks for shopping with us!</p>
+        <p><strong>${process.env.FROM_NAME || 'BookBazaar Team'}</strong></p>
+      </div>
+    `,
+  }),
+};
