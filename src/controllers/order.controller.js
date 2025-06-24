@@ -6,17 +6,19 @@ import { validationResult } from "express-validator";
 import { CartItem } from "../models/cartItem.model.js";
 import { Order } from "../models/order.model.js";
 import { sendEmail } from "../lib/email/sendEmail.js";
- 
+
 export const addToCart = asyncHandler(async (req, res) => {
   const { book, quantity } = req.body;
-  
-  console.log(req.user._id)
-  const bookItem = await Book.findById(book)
-  console.log("bookItem")
-  console.log(bookItem)
-  if(quantity > bookItem.stock){
-    throw new ApiError(400,`Only ${bookItem.stock} items are left. You can not buy more than ${bookItem.stock} at this time!`)
 
+  console.log(req.user._id);
+  const bookItem = await Book.findById(book);
+  console.log("bookItem");
+  console.log(bookItem);
+  if (quantity > bookItem.stock) {
+    throw new ApiError(
+      400,
+      `Only ${bookItem.stock} items are left. You can not buy more than ${bookItem.stock} at this time!`
+    );
   }
   const cartItem = await CartItem.create({
     user: req.user._id,
@@ -35,9 +37,8 @@ export const addToCart = asyncHandler(async (req, res) => {
   return res.status(response.statusCode).json(response);
 });
 
-
 export const createOrder = asyncHandler(async (req, res) => {
-  const {shippingAddress} = req.body
+  const { shippingAddress } = req.body;
   const cartItem = await CartItem.find({
     user: req.user._id,
   }).populate("book");
@@ -60,80 +61,81 @@ export const createOrder = asyncHandler(async (req, res) => {
     user: req.user._id,
     items,
     totalAmount,
-    shippingAddress
+    shippingAddress,
   });
 
   if (!order) {
     throw new ApiError(400, "Failed to create order");
   }
 
+  items.map(async (book) => {
+    const updatedBooksStock = await Book.findOneAndUpdate(
+    { _id: book.book },
+    { $inc: { stock: -book.quantity } },
+    { new: true }
+  );
+    console.log("updatedBooksStock")
+    console.log(updatedBooksStock)
+  });
 
- console.log(req.user.email)
- console.log(req.user)
+  console.log(req.user.email);
+  console.log(req.user);
 
- await sendEmail("ORDER_PLACED",req.user.email,{orderId:order._id.toString()})
+  await sendEmail("ORDER_PLACED", req.user.email, {
+    orderId: order._id.toString(),
+  });
+  await CartItem.deleteMany({ user: req.user._id });
 
-    await CartItem.deleteMany({ user: req.user._id });
+  const response = new ApiResponse(
+    201,
+    { order },
+    "Order created successfylly.You will get an conformation email soon. Note: it will send to the mailtrap as it is testing"
+  );
 
-
-  const response = new ApiResponse(201,{order},"Order created successfylly.You will get an conformation email soon. Note: it will send to the mailtrap as it is testing")
-
-  return res 
-        .status(response.statusCode)
-        .json(response)
-
-
+  return res.status(response.statusCode).json(response);
 });
 
-
-export const getAllOrdersForUser = asyncHandler(async(req,res)=>{
-
-  const userId = req.user._id
-  if(!userId){
-    throw new ApiError(400,"Failed to get user id from the reqest!")
-
+export const getAllOrdersForUser = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  if (!userId) {
+    throw new ApiError(400, "Failed to get user id from the reqest!");
   }
 
-  const userOrders = await Order.find({user:userId})
-  console.log(userOrders)
+  const userOrders = await Order.find({ user: userId });
+  console.log(userOrders);
 
-  if(!userOrders){
-    throw new ApiError(400,"Failed to get all orders!")
+  if (!userOrders) {
+    throw new ApiError(400, "Failed to get all orders!");
   }
 
+  const response = new ApiResponse(
+    200,
+    { userOrders },
+    "Get all orders successfylly"
+  );
 
-  const response = new ApiResponse(200,{userOrders},"Get all orders successfylly")
+  return res.status(response.statusCode).json(response);
+});
 
+export const getOrderDetailsById = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
 
-  return res 
-        .status(response.statusCode)
-        .json(response)
-
-})
-
-
-export const getOrderDetailsById = asyncHandler(async(req,res)=>{
-
-  const orderId = req.params.id 
-
-  if(!orderId){
-    throw new ApiError(400,"Failed to get user id from the parameter!")
-
+  if (!orderId) {
+    throw new ApiError(400, "Failed to get user id from the parameter!");
   }
 
-  const order = await Order.findById(orderId)
-  console.log(order)
+  const order = await Order.findById(orderId);
+  console.log(order);
 
-  if(!order){
-    throw new ApiError(400,"Failed to get order!")
+  if (!order) {
+    throw new ApiError(400, "Failed to get order!");
   }
 
+  const response = new ApiResponse(
+    200,
+    { order },
+    "Get order details successfylly"
+  );
 
-  const response = new ApiResponse(200,{order},"Get order details successfylly")
-
-
-  return res 
-        .status(response.statusCode)
-        .json(response)
-
-})
+  return res.status(response.statusCode).json(response);
+});
